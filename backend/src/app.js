@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import { produtoRoutes, authRoutes } from './routes/index.js'
+import { produtoRoutes, authRoutes, adminRouters} from './routes/index.js'
 
 const app = express()
 
@@ -9,6 +9,7 @@ app.use(express.json())
 
 app.use('/produtos', produtoRoutes)
 app.use('/auth', authRoutes)
+app.use('/admin', adminRouters)
 
 app.use('/uploads', express.static('uploads'))
 

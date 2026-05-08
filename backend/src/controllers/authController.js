@@ -132,3 +132,33 @@ export const listUsers = async (req, res) => {
     })
   }
 }
+
+export const profile = async (
+  req,
+  res
+) => {
+
+  try {
+
+    const user = await db.User.findByPk(
+      req.user.id,
+      {
+        attributes: {
+          exclude: ['senha']
+        }
+      }
+    )
+
+    res.json(user)
+
+  } catch (error) {
+
+    console.log(error)
+
+    res.status(500).json({
+      error: 'Erro ao buscar perfil'
+    })
+
+  }
+
+}

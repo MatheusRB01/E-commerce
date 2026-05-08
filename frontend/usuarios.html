@@ -1,11 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+    <link rel="stylesheet" href="./css/usuarios-admin.css">
+
+    <title>Usuários</title>
+
 </head>
+
 <body>
-    
+
+    <h1>Painel de Usuários</h1>
+
+    <div class="total">
+        Total de usuários:
+        <strong id="totalUsuarios">0</strong>
+    </div>
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Ações</th>
+            </tr>
+
+        </thead>
+
+        <tbody id="tabelaUsuarios">
+
+        </tbody>
+
+    </table>
+
+    <script src="./js/usuarios-admin.js"></script>
+
 </body>
+
 </html>
