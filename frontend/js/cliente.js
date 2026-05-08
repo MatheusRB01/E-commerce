@@ -13,6 +13,37 @@ function checkAuth() {
 
 const token = checkAuth()
 
+async function carregarUsuario() {
+
+  try {
+
+    const res = await fetch("http://localhost:3000/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    if (res.status === 401) {
+      localStorage.clear()
+      window.location.replace("login.html")
+      return
+    }
+
+    const user = await res.json()
+
+    const userName = document.getElementById("userName")
+
+    if (userName) {
+      userName.innerHTML = `${user.nome}`
+    }
+
+  } catch (err) {
+    console.error("Erro ao carregar usuário:", err)
+  }
+}
+
+carregarUsuario()
+
 /* =========================
 🚪 LOGOUT
 ========================= */
@@ -28,47 +59,36 @@ if (logoutBtn) {
   })
 }
 
-/* =========================
-📦 CARREGAR PRODUTOS
-========================= */
+ const userBox =
+      document.querySelector(".userName")
+
+    if (userBox) {
+
+      userBox.innerHTML =
+        `👤 ${data.nome}`
+
+    }
+
 const API = "http://localhost:3000/produtos"
 const lista = document.getElementById("lista")
 
-async function carregarProdutos() {
-  try {
-    const res = await fetch(API, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+const user = JSON.parse(
+  localStorage.getItem("user")
+)
 
-    if (res.status === 401) {
-      // token inválido ou expirado
-      localStorage.clear()
-      window.location.replace("login.html")
-      return
-    }
+if (user) {
 
-    const produtos = await res.json()
+  const userName =
+    document.getElementById("userName")
 
-    lista.innerHTML = produtos.map(p => `
-      <div class="produto">
-        ${p.imagem ? `<img src="http://localhost:3000/uploads/${p.imagem}">` : ""}
+  if (userName) {
 
-        <div class="produto-content">
-          <h3>${p.nome}</h3>
-          <p>R$ ${p.preco}</p>
-          <p>${p.descricao || ""}</p>
-        </div>
-      </div>
-    `).join("")
+    userName.innerHTML =
+      `${user.nome}`
 
-  } catch (err) {
-    console.error("Erro ao carregar produtos:", err)
   }
-}
 
-carregarProdutos()
+}
 
 /* =========================
 🚫 BLOQUEAR BOTÃO VOLTAR

@@ -1,262 +1,339 @@
+/* =========================
+RESET
+========================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
 }
 
+/* =========================
+BODY
+========================= */
 body {
-  height: 100vh;
+  min-height: 100vh;
+
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #fafafa;
-}
+  flex-direction: column;
 
-/* Container geral com fade */
-.container {
-  animation: fadeIn 0.8s ease forwards;
-}
+  font-family: Arial, sans-serif;
 
-/* Caixa de login */
-.login-box {
-  background: #fff;
-  width: 320px;
-  padding: 40px;
-  border: 1px solid #dbdbdb;
-  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    #f8fafc 0%,
+    #eef2f7 100%
+  );
 
-  /* animação estilo "subindo" */
-  transform: translateY(30px);
+  color: #111827;
+
   opacity: 0;
-  animation: slideUp 0.8s ease forwards;
+  transform: translateX(40px);
+
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
 }
 
-/* Título */
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 26px;
-  color: #262626;
-}
-
-/* Inputs */
-input {
-  width: 100%;
-  padding: 10px;
-  margin: 8px 0;
-  border: 1px solid #dbdbdb;
-  border-radius: 5px;
-  background: #fafafa;
-  transition: 0.3s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #a8a8a8;
-  background: #fff;
-}
-
-/* Botão */
-button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 5px;
-  background: #0095f6;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: #007cd1;
-  transform: scale(1.03);
-}
-
-/* ANIMAÇÕES */
-@keyframes slideUp {
-  0% {
-    transform: translateY(50px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* =========================
-LINK CRIAR CONTA
-========================= */
-/* =========================
-BASE (COMPARTILHADO)
-========================= */
-.login-link,
-.register-link {
-  display: inline-block;
-  margin-top: 15px;
-
-  font-size: 14px;
-  font-weight: 500;
-
-  text-decoration: none;
-  position: relative;
-
-  transition: color 0.2s ease;
-}
-
-/* =========================
-LOGIN LINK
-========================= */
-.login-link {
-  color: #10b981;
-}
-
-.login-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-
-  width: 0%;
-  height: 2px;
-
-  background-color: #10b981;
-  transition: width 0.25s ease;
-}
-
-.login-link:hover {
-  color: #059669;
-}
-
-.login-link:hover::after {
-  width: 100%;
-}
-
-/* =========================
-REGISTER LINK
-========================= */
-.register-link {
-  color: #3b82f6;
-}
-
-.register-link::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -3px;
-
-  width: 0%;
-  height: 2px;
-
-  background-color: #3b82f6;
-  transition: width 0.25s ease;
-}
-
-.register-link:hover {
-  color: #2563eb;
-}
-
-.register-link:hover::after {
-  width: 100%;
-}
-
-
-body {
-  opacity: 0;
-  transform: translateX(50px);
-  transition: all 0.4s ease;
-}
-
-/* quando carregou */
+/* carregado */
 body.loaded {
   opacity: 1;
   transform: translateX(0);
 }
 
-/* quando está saindo */
+/* saindo */
 body.fade-out {
   opacity: 0;
-  transform: translateX(-50px);
+  transform: translateX(-40px);
 }
 
-/* RESET */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* ESTRUTURA PRINCIPAL */
-body {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-family: Arial;
-  background: #fafafa;
-}
-
-/* NAVBAR (topo fixo visualmente) */
+/* =========================
+NAVBAR
+========================= */
 .navbar {
   width: 100%;
-  background: #ffda08;
-  color: rgb(0, 0, 0);
 
   display: flex;
   justify-content: space-between;
   align-items: center;
 
-  padding: 15px 40px;
+  padding: 18px 40px;
+
+  background: #e5e7eb;
+
+  backdrop-filter: blur(10px);
+
+  border-bottom: 1px solid #e5e7eb;
+
+  position: sticky;
+  top: 0;
+
+  z-index: 1000;
 }
 
-/* CONTEÚDO (MEIO) */
-.main {
-  flex: 1; /* ESSA LINHA É O SEGREDO */
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* logo */
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #111827;
 }
 
-/* CAIXA DO FORM */
-.login-box {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  width: 300px;
-}
-
-/* FOOTER (embaixo SEM quebrar layout) */
-.footer {
-  width: 100%;
-  background: #ffda08;
-  color: rgb(0, 0, 0);
-  text-align: center;
-  padding: 15px;
-}
-
+/* links */
 .nav-links {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  gap: 25px;
 }
 
 .nav-links a {
-  color: rgb(0, 0, 0);
   text-decoration: none;
+  color: #374151;
+
   font-size: 14px;
+  font-weight: 500;
+
+  position: relative;
+
+  transition: 0.3s ease;
+}
+
+.nav-links a::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+
+  width: 0%;
+  height: 2px;
+
+  background: #111827;
+
+  transition: width 0.3s ease;
 }
 
 .nav-links a:hover {
-  opacity: 0.7;
+  color: #111827;
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+/* =========================
+MAIN
+========================= */
+.main {
+  flex: 1;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 40px 20px;
+}
+
+/* =========================
+LOGIN BOX
+========================= */
+.login-box {
+  width: 100%;
+  max-width: 360px;
+
+  background: white;
+
+  padding: 40px;
+
+  border-radius: 20px;
+
+  border: 1px solid #f1f5f9;
+
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.06);
+
+  transform: translateY(30px);
+
+  opacity: 0;
+
+  animation: slideUp 0.8s ease forwards;
+}
+
+/* =========================
+TÍTULO
+========================= */
+.login-box h1 {
+  text-align: center;
+
+  margin-bottom: 25px;
+
+  font-size: 28px;
+
+  color: #111827;
+}
+
+/* =========================
+INPUTS
+========================= */
+input {
+  width: 100%;
+
+  padding: 12px 14px;
+
+  margin-bottom: 15px;
+
+  border-radius: 10px;
+
+  border: 1px solid #d1d5db;
+
+  background: #f9fafb;
+
+  font-size: 14px;
+
+  transition: 0.3s ease;
+}
+
+input:focus {
+  outline: none;
+
+  border-color: #111827;
+
+  background: white;
+
+  box-shadow:
+    0 0 0 4px rgba(17, 24, 39, 0.08);
+}
+
+/* =========================
+BOTÃO
+========================= */
+button {
+  width: 100%;
+
+  padding: 12px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: #111827;
+
+  color: white;
+
+  font-size: 14px;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.3s ease;
+}
+
+button:hover {
+  background: #1f2937;
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 20px rgba(17, 24, 39, 0.2);
+}
+
+/* =========================
+LINKS
+========================= */
+.login-link,
+.register-link {
+  display: inline-block;
+
+  margin-top: 15px;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  color: #2563eb;
+
+  position: relative;
+
+  transition: 0.3s ease;
+}
+
+.login-link::after,
+.register-link::after {
+  content: "";
+
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+
+  width: 0%;
+  height: 2px;
+
+  background: #2563eb;
+
+  transition: width 0.3s ease;
+}
+
+.login-link:hover,
+.register-link:hover {
+  color: #1d4ed8;
+}
+
+.login-link:hover::after,
+.register-link:hover::after {
+  width: 100%;
+}
+
+/* =========================
+FOOTER
+========================= */
+.footer {
+  width: 100%;
+
+  text-align: center;
+
+  padding: 18px;
+
+  background: rgba(202, 200, 200, 0.85);
+
+  backdrop-filter: blur(10px);
+
+  border-top: 1px solid #e5e7eb;
+
+  color: #3c3f46;
+
+  font-size: 14px;
+}
+
+/* =========================
+ANIMAÇÕES
+========================= */
+@keyframes slideUp {
+
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+/* =========================
+RESPONSIVO
+========================= */
+@media (max-width: 768px) {
+
+  .navbar {
+    padding: 15px 20px;
+  }
+
+  .nav-links {
+    gap: 15px;
+  }
+
+  .login-box {
+    padding: 30px;
+  }
+
 }

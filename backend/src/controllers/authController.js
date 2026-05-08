@@ -8,6 +8,17 @@ export const register = async (req, res) => {
   const { nome, email, senha, telefone } = req.body
 
   try {
+
+    const userExists = await db.User.findOne({
+      where: { email }
+    })
+
+    if (userExists) {
+      return res.status(400).json({
+        error: 'Email já cadastrado'
+      })
+    }
+
     const hash = await bcrypt.hash(senha, 10)
 
     const user = await db.User.create({
@@ -18,30 +29,58 @@ export const register = async (req, res) => {
       role: 'cliente'
     })
 
+    const token = jwt.sign(
+      {
+        id: user.id,
+        role: user.role,
+        nome: user.nome
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    )
+
     const { senha: _, ...userSafe } = user.toJSON()
 
-    res.status(201).json(userSafe)
+    res.status(201).json({
+      token,
+      user: userSafe
+    })
+
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: "erro ao cadastrar" })
+
+    res.status(500).json({
+      error: 'Erro ao cadastrar'
+    })
   }
 }
 
 // ✅ LOGIN
 export const login = async (req, res) => {
+
   const { email, senha } = req.body
 
   try {
-    const user = await db.User.findOne({ where: { email } })
+
+    const user = await db.User.findOne({
+      where: { email }
+    })
 
     if (!user) {
-      return res.status(404).json({ error: 'Usuário não encontrado' })
+      return res.status(404).json({
+        error: 'Usuário não encontrado'
+      })
     }
 
-    const match = await bcrypt.compare(senha, user.senha)
+    const match = await bcrypt.compare(
+      senha,
+      user.senha
+    )
 
     if (!match) {
-      return res.status(401).json({ error: 'Senha inválida' })
+      return res.status(401).json({
+        error: 'Senha inválida'
+      })
     }
 
     const token = jwt.sign(
@@ -62,18 +101,34 @@ export const login = async (req, res) => {
     })
 
   } catch (error) {
-    res.status(500).json({ error: 'Erro no login' })
+
+    console.error(error)
+
+    res.status(500).json({
+      error: 'Erro no login'
+    })
   }
 }
 
+// ✅ LIST USERS
 export const listUsers = async (req, res) => {
+
   try {
+
     const users = await db.User.findAll({
-      attributes: { exclude: ['senha'] }
+      attributes: {
+        exclude: ['senha']
+      }
     })
 
     res.json(users)
+
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar usuários' })
+
+    console.error(error)
+
+    res.status(500).json({
+      error: 'Erro ao buscar usuários'
+    })
   }
 }

@@ -1,0 +1,169 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* BODY */
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f1e9;
+}
+
+/* HEADER */
+header {
+  position: relative;
+  z-index: 9999;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* NAVBAR */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10%;
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #b08b57;
+}
+
+/* MENU */
+.menu {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.menu li {
+  position: relative;
+}
+
+.menu a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+/* BOTÃO DROPDOWN */
+.drop-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+}
+
+/* DROPDOWN */
+.dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* COLADO no botão */
+  left: 0;
+
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+
+  min-width: 180px;
+  padding: 10px 0;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(5px);
+
+  transition: 0.25s ease;
+  z-index: 9999;
+}
+
+.dropdown-menu li {
+  padding: 12px 20px;
+}
+
+.dropdown-menu li a {
+  display: block;
+  color: #333;
+}
+
+.dropdown-menu li:hover {
+  background: #f5f1e9;
+}
+
+/* ATIVO */
+.dropdown.active .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* HERO */
+.hero {
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  background: linear-gradient(to bottom, #f5f1e9, #e8dfcf);
+
+  position: relative;
+  z-index: 1;
+}
+
+.hero-content {
+  max-width: 800px;
+  padding: 20px;
+}
+
+/* IMAGEM */
+.hero-image img {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  object-fit: contain;
+
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+
+  margin-bottom: 20px;
+}
+
+/* TEXTO */
+.hero h1 {
+  font-size: 2.8rem;
+  color: #2c2c2c;
+}
+
+.hero p {
+  margin-top: 10px;
+  color: #555;
+}
+
+/* BOTÃO */
+.btn {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 14px 30px;
+
+  background: #b08b57;
+  color: white;
+
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: bold;
+
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #8c6d45;
+}

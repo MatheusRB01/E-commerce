@@ -26,6 +26,7 @@ async function checkAdmin() {
   if (data.user.role !== 'admin') {
     window.location.href = 'admin.html'
   }
+  
 }
 
 checkAdmin()

@@ -47,17 +47,33 @@ loginForm.addEventListener('submit', async (e) => {
   const data = await res.json()
 
   if (data.token) {
+
+    // salva token
     setToken(data.token)
 
-    const payload = JSON.parse(atob(data.token.split('.')[1]))
+    // salva usuário
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    )
+
+    const payload = JSON.parse(
+      atob(data.token.split('.')[1])
+    )
 
     if (payload.role === 'admin') {
+
       window.location.href = 'index.html'
+
     } else {
+
       window.location.href = 'cliente.html'
+
     }
 
   } else {
+
     alert(data.error || 'Erro no login')
+
   }
 })

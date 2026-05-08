@@ -134,6 +134,31 @@ inputImagem.addEventListener('change', () => {
   texto.textContent = `📁 ${file.name}`
 })
 
+const logoutBtn = document.querySelector(".logout")
+
+if (logoutBtn) {
+
+  logoutBtn.addEventListener("click", (e) => {
+
+    e.preventDefault()
+
+    localStorage.clear()
+
+    window.location.replace("pagina inicial.html")
+
+  })
+
+}
+
+   const userBox =
+      document.querySelector(".user")
+
+    if (userBox) {
+
+      userBox.innerHTML =
+        `👤 ${data.nome}`
+
+    }
 
 
 carregarProdutos()
