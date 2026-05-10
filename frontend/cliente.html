@@ -1,23 +1,152 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
   <meta charset="UTF-8">
-  <title>Produtos</title>
-  <link rel="stylesheet" href="css/cliente.css">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Produtos
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="css/cliente.css"
+  >
+
 </head>
+
 <body>
 
-  <!-- TOPO -->
+  <!-- =========================
+  TOPO
+  ========================= -->
   <header class="top-bar">
-    <h2 id="userName"></h2>
-    <h1>🛍️ Produtos</h1>
-    <a href="#" class="logout">Sair</a>
+
+    <div class="top-left">
+
+      <h1>
+        🛍️ Produtos
+      </h1>
+
+    </div>
+
+    <div class="top-right">
+
+      <span id="userName">
+        👤 Usuário
+      </span>
+
+      <a
+        href="#"
+        class="logout"
+      >
+        Sair
+      </a>
+
+    </div>
+
   </header>
 
-  <!-- LISTA -->
-  <section id="lista"></section>
+  <!-- =========================
+  LISTA PRODUTOS
+  ========================= -->
+  <section id="lista">
+  </section>
 
-  <script src="js/cliente.js" type="module"></script>
+  <!-- =========================
+  BOTÃO CHAT
+  ========================= -->
+  <button
+    id="abrirChat"
+    class="chat-button"
+  >
+    💬
+  </button>
+
+  <!-- =========================
+  CHAT
+  ========================= -->
+  <div
+    id="chatBox"
+    class="chat-box"
+  >
+
+    <!-- HEADER -->
+    <div class="chat-header">
+
+      <div class="chat-info">
+
+        <div class="chat-avatar">
+          💬
+        </div>
+
+        <div class="chat-textos">
+
+          <h3 id="chatTitulo">
+            Suporte
+          </h3>
+
+          <span id="chatStatus">
+            Online
+          </span>
+
+        </div>
+
+      </div>
+
+      <button id="fecharChat">
+        ✕
+      </button>
+
+    </div>
+
+    <!-- MENSAGENS -->
+    <div
+      id="mensagens"
+      class="chat-messages"
+    >
+
+      <!-- mensagens aparecem aqui -->
+
+    </div>
+
+    <!-- INPUT -->
+    <div class="chat-input-area">
+
+      <input
+        type="text"
+        id="inputMensagem"
+        placeholder="Digite sua mensagem..."
+        autocomplete="off"
+      >
+
+      <button id="btnEnviar">
+        Enviar
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- =========================
+  SOCKET.IO
+  ========================= -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+  <!-- =========================
+  CLIENT JS
+  ========================= -->
+  <script
+    src="js/cliente.js"
+    type="module"
+  ></script>
 
 </body>
+
 </html>

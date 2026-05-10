@@ -1,18 +1,9 @@
-/* =========================
-🔐 PROTEÇÃO GLOBAL
-========================= */
-
 function checkAuth() {
-
-  const token =
-    localStorage.getItem("token")
+  const token = localStorage.getItem("token")
 
   if (!token) {
-
-    window.location.replace(
-      "login.html"
-    )
-
+    window.location.replace("login.html")
+    return null
   }
 
   return token
@@ -20,167 +11,148 @@ function checkAuth() {
 
 const token = checkAuth()
 
-/* =========================
-👤 CARREGAR USUÁRIO
-========================= */
+let usuarioLogado = JSON.parse(localStorage.getItem("user"))
 
+// =========================
+// SOCKET
+// =========================
+const socket = io("http://localhost:3000", {
+  transports: ["websocket"]
+})
+
+socket.on("connect", () => {
+  console.log("Socket conectado ✅")
+})
+
+// =========================
+// USUÁRIO
+// =========================
 async function carregarUsuario() {
-
   try {
-
-    const res = await fetch(
-      'http://localhost:3000/auth/perfil',
-      {
-        headers: {
-          Authorization:
-            `Bearer ${token}`
-        }
+    const res = await fetch("http://localhost:3000/auth/perfil", {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    )
+    })
 
-    // TOKEN INVÁLIDO
-    if (res.status === 401) {
-
+    if (!res.ok) {
       localStorage.clear()
-
-      window.location.replace(
-        "login.html"
-      )
-
+      window.location.replace("login.html")
       return
     }
 
-    const data =
-      await res.json()
+    const data = await res.json()
 
-    const user =
-      data.user
+    usuarioLogado = data.user
 
-    // SALVAR LOCALMENTE
-    localStorage.setItem(
-      "user",
-      JSON.stringify(user)
-    )
+    localStorage.setItem("user", JSON.stringify(usuarioLogado))
 
-    atualizarNome(user)
+    atualizarNome(usuarioLogado)
 
   } catch (err) {
-
-    console.error(
-      "Erro ao carregar usuário:",
-      err
-    )
-
+    console.error("Erro ao carregar usuário:", err)
   }
-
 }
-
-/* =========================
-👤 ATUALIZAR NOME
-========================= */
 
 function atualizarNome(user) {
-
-  // HEADER
-  const userName =
-    document.getElementById(
-      "userName"
-    )
+  const userName = document.getElementById("userName")
 
   if (userName) {
-
-    userName.innerHTML =
-      `👤 ${user.nome}`
-
+    userName.innerHTML = `👤 ${user.nome}`
   }
-
-  // OUTRA BOX
-  const userBox =
-    document.querySelector(
-      ".userName"
-    )
-
-  if (userBox) {
-
-    userBox.innerHTML =
-      `👤 ${user.nome}`
-
-  }
-
 }
 
-/* =========================
-📦 USUÁRIO LOCAL
-========================= */
-
-const user = JSON.parse(
-  localStorage.getItem("user")
-)
-
-if (user) {
-
-  atualizarNome(user)
-
-}
-
-/* =========================
-🚪 LOGOUT
-========================= */
-
-const logoutBtn =
-  document.querySelector(
-    ".logout"
-  )
+// =========================
+// LOGOUT
+// =========================
+const logoutBtn = document.querySelector(".logout")
 
 if (logoutBtn) {
+  logoutBtn.addEventListener("click", (e) => {
+    e.preventDefault()
 
-  logoutBtn.addEventListener(
-    "click",
-    (e) => {
-
-      e.preventDefault()
-
-      localStorage.clear()
-
-      window.location.replace(
-        "login.html"
-      )
-
-    }
-  )
-
+    localStorage.clear()
+    window.location.replace("login.html")
+  })
 }
 
-/* =========================
-🚫 BLOQUEAR VOLTAR
-========================= */
-
-window.history.pushState(
-  null,
-  null,
-  window.location.href
-)
+// =========================
+// BLOQUEAR VOLTAR
+// =========================
+window.history.pushState(null, null, window.location.href)
 
 window.onpopstate = () => {
-
   window.history.go(1)
-
 }
 
-/* =========================
-🚀 INICIAR
-========================= */
+// =========================
+// CHAT - ABRIR/FECHAR
+// =========================
+const abrirChat = document.getElementById("abrirChat")
+const fecharChat = document.getElementById("fecharChat")
+const chatBox = document.getElementById("chatBox")
 
+if (abrirChat && fecharChat && chatBox) {
+
+  abrirChat.addEventListener("click", () => {
+    chatBox.classList.add("active")
+  })
+
+  fecharChat.addEventListener("click", () => {
+    chatBox.classList.remove("active")
+  })
+}
+
+// =========================
+// ENVIAR MENSAGEM
+// =========================
+function enviarMensagem() {
+  const input = document.getElementById("inputMensagem")
+
+  const texto = input.value.trim()
+  if (!texto || !usuarioLogado) return
+
+  socket.emit("mensagem", {
+    from: usuarioLogado.id,
+    to: 1,
+    text: texto
+  })
+
+  input.value = ""
+}
+
+document.getElementById("btnEnviar")?.addEventListener("click", enviarMensagem)
+
+// =========================
+// RECEBER MENSAGEM
+// =========================
+socket.on("novaMensagem", (msg) => {
+  mostrarMensagem(msg)
+})
+
+// =========================
+// RENDER MENSAGEM (CORRETO)
+// =========================
+function mostrarMensagem(msg) {
+
+  const box = document.getElementById("mensagens")
+  if (!box) return
+
+  const div = document.createElement("div")
+
+  const meuId = usuarioLogado?.id
+  const isMine = msg.from === meuId
+
+  div.classList.add("message", isMine ? "mine" : "other")
+
+  div.innerText = msg.text ?? ""
+
+  box.appendChild(div)
+
+  box.scrollTop = box.scrollHeight
+}
+
+// =========================
+// INIT
+// =========================
 carregarUsuario()
-
-/* =========================
-🛒 PRODUTOS
-========================= */
-
-const API =
-  "http://localhost:3000/produtos"
-
-const lista =
-  document.getElementById(
-    "lista"
-  )

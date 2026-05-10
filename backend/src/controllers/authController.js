@@ -149,7 +149,9 @@ export const profile = async (
       }
     )
 
-    res.json(user)
+    res.json({
+      user
+    })
 
   } catch (error) {
 
