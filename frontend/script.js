@@ -1,10 +1,10 @@
-const API = 'http://localhost:3000/produtos'
+const API = "http://localhost:3000/produtos"
 
 const form =
-  document.getElementById('form')
+  document.getElementById("form")
 
 const lista =
-  document.querySelector('#lista')
+  document.querySelector("#lista")
 
 let produtos = []
 
@@ -12,13 +12,26 @@ let editandoId = null
 
 let usuarioLogado = null
 
-// =========================
-// SOCKET.IO
-// =========================
+let conversaAtual = null
+
+let notificacoes = {}
+
+const ADMIN_ID = 1
+
+// ========================================
+// SOCKET
+// ========================================
+
+const token =
+  localStorage.getItem("token")
 
 const socket = io(
   "http://localhost:3000",
   {
+
+    auth: {
+      token
+    },
 
     transports: ["websocket"],
 
@@ -27,31 +40,30 @@ const socket = io(
   }
 )
 
-// =========================
+// ========================================
 // CARREGAR USUÁRIO
-// =========================
+// ========================================
 
 async function carregarUsuario() {
 
   try {
 
-    const token =
-      localStorage.getItem("token")
-
     if (!token) return
 
-    const response = await fetch(
+    const response =
+      await fetch(
+        "http://localhost:3000/auth/perfil",
+        {
 
-      'http://localhost:3000/auth/perfil',
+          headers: {
 
-      {
-        headers: {
-          Authorization:
-            `Bearer ${token}`
+            Authorization:
+              `Bearer ${token}`
+
+          }
+
         }
-      }
-
-    )
+      )
 
     const data =
       await response.json()
@@ -59,7 +71,10 @@ async function carregarUsuario() {
     usuarioLogado =
       data.user
 
-    console.log(usuarioLogado)
+    console.log(
+      "👤 Usuário:",
+      usuarioLogado
+    )
 
     const userBox =
       document.querySelector(".user")
@@ -67,7 +82,24 @@ async function carregarUsuario() {
     if (userBox) {
 
       userBox.innerHTML =
-        `👤 ${data.user.nome}`
+        `👤 ${usuarioLogado.nome}`
+
+    }
+
+    // ====================================
+    // CLIENTE ABRE CHAT COM ADMIN
+    // ====================================
+
+    if (
+      usuarioLogado.role === "cliente"
+    ) {
+
+      conversaAtual = ADMIN_ID
+
+      socket.emit(
+        "buscarMensagens",
+        ADMIN_ID
+      )
 
     }
 
@@ -79,9 +111,9 @@ async function carregarUsuario() {
 
 }
 
-// =========================
+// ========================================
 // CARREGAR PRODUTOS
-// =========================
+// ========================================
 
 async function carregarProdutos() {
 
@@ -91,20 +123,27 @@ async function carregarProdutos() {
   produtos =
     await res.json()
 
-  lista.innerHTML = ''
+  lista.innerHTML = ""
 
   produtos.forEach((p, index) => {
 
     const div =
-      document.createElement('div')
+      document.createElement("div")
 
-    div.classList.add('produto')
+    div.classList.add(
+      "produto"
+    )
 
     div.innerHTML = `
 
       ${p.imagem
-        ? `<img src="http://localhost:3000/uploads/${p.imagem}" alt="${p.nome}">`
-        : ''
+        ? `
+          <img
+            src="http://localhost:3000/uploads/${p.imagem}"
+            alt="${p.nome}"
+          >
+        `
+        : ""
       }
 
       <div class="produto-content">
@@ -116,7 +155,7 @@ async function carregarProdutos() {
         </p>
 
         <p class="descricao">
-          ${p.descricao || ''}
+          ${p.descricao || ""}
         </p>
 
       </div>
@@ -143,7 +182,9 @@ async function carregarProdutos() {
 
       setTimeout(() => {
 
-        div.classList.add('show')
+        div.classList.add(
+          "show"
+        )
 
       }, index * 100)
 
@@ -151,18 +192,25 @@ async function carregarProdutos() {
 
   })
 
+  // ====================================
   // DELETE
+  // ====================================
+
   document
-    .querySelectorAll('.btn-delete')
+    .querySelectorAll(
+      ".btn-delete"
+    )
 
     .forEach(btn => {
 
       btn.addEventListener(
-        'click',
+        "click",
         async () => {
 
           const id =
-            btn.getAttribute('data-id')
+            btn.getAttribute(
+              "data-id"
+            )
 
           await deletar(id)
 
@@ -171,18 +219,25 @@ async function carregarProdutos() {
 
     })
 
+  // ====================================
   // EDITAR
+  // ====================================
+
   document
-    .querySelectorAll('.btn-edit')
+    .querySelectorAll(
+      ".btn-edit"
+    )
 
     .forEach(btn => {
 
       btn.addEventListener(
-        'click',
+        "click",
         () => {
 
           const id =
-            btn.getAttribute('data-id')
+            btn.getAttribute(
+              "data-id"
+            )
 
           const produto =
             produtos.find(
@@ -190,27 +245,30 @@ async function carregarProdutos() {
             )
 
           document
-            .getElementById('nome')
+            .getElementById("nome")
             .value = produto.nome
 
           document
-            .getElementById('valor')
+            .getElementById("valor")
             .value = produto.preco
 
           document
-            .getElementById('descri')
-            .value = produto.descricao
+            .getElementById("descri")
+            .value =
+            produto.descricao
 
           editandoId = id
 
           const botao =
-            form.querySelector('button')
+            form.querySelector(
+              "button"
+            )
 
           botao.textContent =
-            'Atualizar produto'
+            "Atualizar produto"
 
           botao.style.backgroundColor =
-            '#f59e0b'
+            "#f59e0b"
 
         }
       )
@@ -219,115 +277,114 @@ async function carregarProdutos() {
 
 }
 
-// =========================
-// SUBMIT FORM
-// =========================
+// ========================================
+// SUBMIT
+// ========================================
 
 form.addEventListener(
-  'submit',
-  async (e) => {
+  "submit",
+  async e => {
 
     e.preventDefault()
 
     const botao =
-      form.querySelector('button')
+      form.querySelector(
+        "button"
+      )
 
     const formData =
       new FormData()
 
     formData.append(
-
-      'nome',
-
+      "nome",
       document
-        .getElementById('nome')
+        .getElementById("nome")
         .value
-
     )
 
     formData.append(
-
-      'preco',
-
+      "preco",
       document
-        .getElementById('valor')
+        .getElementById("valor")
         .value
-
     )
 
     formData.append(
-
-      'descricao',
-
+      "descricao",
       document
-        .getElementById('descri')
+        .getElementById("descri")
         .value
-
     )
 
     const file =
       document
-        .getElementById('imagem')
+        .getElementById(
+          "imagem"
+        )
         .files[0]
 
     if (file) {
 
       formData.append(
-        'imagem',
+        "imagem",
         file
       )
 
     }
 
-    // editar
+    // ====================================
+    // EDITAR
+    // ====================================
+
     if (editandoId) {
 
       await fetch(
-
         `${API}/${editandoId}`,
-
         {
-          method: 'PUT',
-          body: formData
-        }
 
+          method: "PUT",
+
+          body: formData
+
+        }
       )
 
       editandoId = null
 
       botao.textContent =
-        'Alteração concluída ✅'
-
-      botao.style.backgroundColor =
-        '#10b981'
+        "Alterado ✅"
 
     }
 
-    // criar
+    // ====================================
+    // CRIAR
+    // ====================================
+
     else {
 
       await fetch(API, {
 
-        method: 'POST',
+        method: "POST",
+
         body: formData
 
       })
 
       botao.textContent =
-        'Produto cadastrado ✅'
-
-      botao.style.backgroundColor =
-        '#10b981'
+        "Cadastrado ✅"
 
     }
+
+    botao.style.backgroundColor =
+      "#10b981"
 
     setTimeout(() => {
 
       botao.textContent =
-        'Cadastrar produto'
+        "Cadastrar produto"
 
       botao.style.backgroundColor =
-        '#3b82f6'
+        "#3b82f6"
 
     }, 2000)
 
@@ -338,67 +395,82 @@ form.addEventListener(
   }
 )
 
-// =========================
+// ========================================
 // DELETAR
-// =========================
+// ========================================
 
 async function deletar(id) {
 
-  await fetch(`${API}/${id}`, {
+  await fetch(
+    `${API}/${id}`,
+    {
 
-    method: 'DELETE'
+      method: "DELETE"
 
-  })
+    }
+  )
 
   carregarProdutos()
 
 }
 
-// =========================
+// ========================================
 // PREVIEW IMAGEM
-// =========================
+// ========================================
 
 const inputImagem =
-  document.getElementById('imagem')
+  document.getElementById(
+    "imagem"
+  )
 
 const preview =
-  document.getElementById('preview-img')
+  document.getElementById(
+    "preview-img"
+  )
 
 const container =
-  document.getElementById('preview-container')
+  document.getElementById(
+    "preview-container"
+  )
 
-inputImagem.addEventListener(
-  'change',
-  () => {
+if (inputImagem) {
 
-    const file =
-      inputImagem.files[0]
+  inputImagem.addEventListener(
+    "change",
+    () => {
 
-    if (!file) return
+      const file =
+        inputImagem.files[0]
 
-    const url =
-      URL.createObjectURL(file)
+      if (!file) return
 
-    preview.src = url
+      const url =
+        URL.createObjectURL(file)
 
-    container.style.display =
-      'block'
+      preview.src = url
 
-  }
-)
+      container.style.display =
+        "block"
 
-// =========================
+    }
+  )
+
+}
+
+// ========================================
 // LOGOUT
-// =========================
+// ========================================
 
 const logoutBtn =
-  document.querySelector(".logout")
+  document.querySelector(
+    ".logout"
+  )
 
 if (logoutBtn) {
 
   logoutBtn.addEventListener(
     "click",
-    (e) => {
+    e => {
 
       e.preventDefault()
 
@@ -413,26 +485,32 @@ if (logoutBtn) {
 
 }
 
-// =========================
-// CHAT FLUTUANTE
-// =========================
+// ========================================
+// CHAT
+// ========================================
 
-const abrirChat =
-  document.getElementById("abrirChat")
+const abrirChatBtn =
+  document.getElementById(
+    "abrirChat"
+  )
 
 const fecharChat =
-  document.getElementById("fecharChat")
+  document.getElementById(
+    "fecharChat"
+  )
 
 const chatBox =
-  document.getElementById("chatBox")
+  document.getElementById(
+    "chatBox"
+  )
 
 if (
-  abrirChat &&
+  abrirChatBtn &&
   fecharChat &&
   chatBox
 ) {
 
-  abrirChat.addEventListener(
+  abrirChatBtn.addEventListener(
     "click",
     () => {
 
@@ -456,9 +534,102 @@ if (
 
 }
 
-// =========================
+// ========================================
+// RENDERIZAR MENSAGEM
+// ========================================
+
+function renderMensagem(msg) {
+
+  const box =
+    document.getElementById(
+      "mensagens"
+    )
+
+  if (!box) return
+
+  const div =
+    document.createElement(
+      "div"
+    )
+
+  // mensagem minha
+  if (
+
+    usuarioLogado &&
+
+    Number(msg.from) ===
+    Number(usuarioLogado.id)
+
+  ) {
+
+    div.classList.add(
+      "message",
+      "mine"
+    )
+
+  }
+
+  // mensagem recebida
+  else {
+
+    div.classList.add(
+      "message",
+      "other"
+    )
+
+  }
+
+  div.innerHTML = `
+
+    <p>${msg.text}</p>
+
+    <small>
+      ${msg.createdAt
+        ? new Date(
+            msg.createdAt
+          ).toLocaleTimeString()
+        : ""
+      }
+    </small>
+
+  `
+
+  box.appendChild(div)
+
+  box.scrollTop =
+    box.scrollHeight
+
+}
+
+// ========================================
+// HISTÓRICO
+// ========================================
+
+socket.on(
+  "historicoMensagens",
+  mensagens => {
+
+    const box =
+      document.getElementById(
+        "mensagens"
+      )
+
+    if (!box) return
+
+    box.innerHTML = ""
+
+    mensagens.forEach(msg => {
+
+      renderMensagem(msg)
+
+    })
+
+  }
+)
+
+// ========================================
 // ENVIAR MENSAGEM
-// =========================
+// ========================================
 
 function enviarMensagem() {
 
@@ -467,97 +638,366 @@ function enviarMensagem() {
       "inputMensagem"
     )
 
+  if (!input) return
+
   const texto =
     input.value.trim()
 
   if (!texto) return
 
-  socket.emit("mensagem", {
+  // ====================================
+  // CLIENTE
+  // ====================================
 
-    de: usuarioLogado.id,
+  if (
 
-    para: 2,
+    usuarioLogado &&
 
-    texto
+    usuarioLogado.role === "cliente"
 
-  })
+  ) {
+
+    socket.emit(
+      "mensagem",
+      {
+
+        to: ADMIN_ID,
+
+        text: texto
+
+      }
+    )
+
+  }
+
+  // ====================================
+  // ADMIN
+  // ====================================
+
+  else {
+
+    if (!conversaAtual) {
+
+      alert(
+        "Selecione uma conversa"
+      )
+
+      return
+
+    }
+
+    socket.emit(
+      "mensagem",
+      {
+
+        to: conversaAtual,
+
+        text: texto
+
+      }
+    )
+
+  }
 
   input.value = ""
 
 }
 
-// =========================
-// RECEBER MENSAGEM
-// =========================
+// ========================================
+// NOVA MENSAGEM
+// ========================================
 
 socket.on(
   "novaMensagem",
-  (msg) => {
+  msg => {
 
-    console.log(msg)
+    console.log(
+      "📩 Nova mensagem:",
+      msg
+    )
 
-    const box =
-      document.getElementById(
-        "mensagens"
-      )
+    // ====================================
+    // ADMIN
+    // ====================================
 
-    const div =
-      document.createElement(
-        "div"
-      )
-
-    // mensagem minha
     if (
-      msg.from ===
-      usuarioLogado.id
+
+      usuarioLogado &&
+
+      usuarioLogado.role === "admin"
+
     ) {
 
-      div.classList.add(
-        "message",
-        "mine"
-      )
+      const clienteId =
+
+        Number(msg.from) === Number(usuarioLogado.id)
+
+          ? Number(msg.to)
+
+          : Number(msg.from)
+
+      const clienteElemento =
+
+        document.querySelector(
+          `.cliente-item[data-id="${clienteId}"]`
+        )
+
+      // ====================================
+      // NOVA MENSAGEM
+      // ====================================
+
+      if (
+
+        Number(conversaAtual) !==
+        Number(clienteId)
+
+      ) {
+
+        if (clienteElemento) {
+
+          clienteElemento.classList.add(
+            "nova-mensagem"
+          )
+
+        }
+
+      }
+
+      // ====================================
+      // NÃO RENDERIZA
+      // ====================================
+
+      if (
+
+        Number(conversaAtual) !==
+        Number(clienteId)
+
+      ) {
+
+        return
+
+      }
 
     }
 
-    // mensagem recebida
-    else {
-
-      div.classList.add(
-        "message",
-        "other"
-      )
-
-    }
-
-    div.innerText = msg.text
-
-    box.appendChild(div)
-
-    // scroll automático
-    box.scrollTop =
-      box.scrollHeight
+    renderMensagem(msg)
 
   }
 )
 
-// =========================
+// ========================================
+// ENTER ENVIA
+// ========================================
+
+const inputMensagem =
+  document.getElementById(
+    "inputMensagem"
+  )
+
+if (inputMensagem) {
+
+  inputMensagem.addEventListener(
+    "keypress",
+    e => {
+
+      if (e.key === "Enter") {
+
+        e.preventDefault()
+
+        enviarMensagem()
+
+      }
+
+    }
+  )
+
+}
+
+// ========================================
 // BOTÃO ENVIAR
-// =========================
+// ========================================
 
 const btnEnviar =
   document.getElementById(
     "btnEnviar"
   )
 
-btnEnviar.addEventListener(
-  "click",
-  enviarMensagem
-)
+if (btnEnviar) {
 
-// =========================
-// INICIAR
-// =========================
+  btnEnviar.addEventListener(
+    "click",
+    enviarMensagem
+  )
+
+}
+
+// ========================================
+// CARREGAR CLIENTES
+// ========================================
+
+async function carregarClientes() {
+
+  try {
+
+    const res =
+      await fetch(
+        "http://localhost:3000/usuarios"
+      )
+
+    const usuarios =
+      await res.json()
+
+    const listaClientes =
+      document.getElementById(
+        "listaClientes"
+      )
+
+    if (!listaClientes) return
+
+    listaClientes.innerHTML = ""
+
+    // ====================================
+    // FILTRA CLIENTES
+    // ====================================
+
+    const clientes =
+      usuarios.filter(user =>
+
+        user.role === "cliente"
+
+      )
+
+    if (!clientes.length) {
+
+      listaClientes.innerHTML = `
+
+        <div class="cliente-vazio">
+
+          Nenhum cliente encontrado
+
+        </div>
+
+      `
+
+      return
+
+    }
+
+    clientes.forEach(cliente => {
+
+      const div =
+        document.createElement("div")
+
+      div.classList.add(
+        "cliente-item"
+      )
+
+      // ====================================
+      // DATA ID
+      // ====================================
+
+      div.dataset.id =
+        cliente.id
+
+      div.innerHTML = `
+
+        <div class="cliente-avatar">
+
+          ${cliente.nome
+            .charAt(0)
+            .toUpperCase()}
+
+        </div>
+
+        <div>
+
+          <strong>
+            ${cliente.nome}
+          </strong>
+
+          <br>
+
+          <small>
+            ID: ${cliente.id}
+          </small>
+
+        </div>
+
+      `
+
+      // ====================================
+      // ABRIR CONVERSA
+      // ====================================
+
+      div.addEventListener(
+        "click",
+        () => {
+
+          // remove active
+          document
+            .querySelectorAll(
+              ".cliente-item"
+            )
+
+            .forEach(el => {
+
+              el.classList.remove(
+                "active"
+              )
+
+            })
+
+          div.classList.add(
+            "active"
+          )
+
+          // remove bolinha
+          div.classList.remove(
+            "nova-mensagem"
+          )
+
+          conversaAtual =
+            cliente.id
+
+          const mensagens =
+            document.getElementById(
+              "mensagens"
+            )
+
+          mensagens.innerHTML = ""
+
+          socket.emit(
+            "buscarMensagens",
+            cliente.id
+          )
+
+          console.log(
+            "💬 Conversa aberta:",
+            cliente.nome
+          )
+
+        }
+      )
+
+      listaClientes.appendChild(
+        div
+      )
+
+    })
+
+  } catch (error) {
+
+    console.error(
+      "Erro clientes:",
+      error
+    )
+
+  }
+
+}
 
 carregarUsuario()
 
 carregarProdutos()
+
+carregarClientes()

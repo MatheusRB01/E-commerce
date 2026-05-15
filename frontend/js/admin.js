@@ -1,328 +1,596 @@
-import { getToken } from './auth.js'
+import { getToken }
+  from "./auth.js"
 
-const token = getToken()
+const token =
+  getToken()
 
-// =========================
+// ====================================
 // SOCKET
-// =========================
-const socket = io("http://localhost:3000", {
-  transports: ["websocket"],
-  autoConnect: false,
-  auth: {
-    token
+// ====================================
+
+const socket = io(
+  "http://localhost:3000",
+  {
+
+    auth: {
+      token
+    },
+
+    transports: ["websocket"],
+
+    upgrade: false,
+
+    autoConnect: false
+
   }
-})
+)
 
-// =========================
+// ====================================
 // VARIÁVEIS
-// =========================
-let usuario = null
-let chatAtual = null
+// ====================================
 
-// =========================
+let usuario =
+  null
+
+let chatAtual =
+  null
+
+// ====================================
 // SOCKET CONNECT
-// =========================
-socket.on("connect", () => {
-  console.log("🟢 Admin conectado")
-})
+// ====================================
 
-// =========================
+socket.on(
+  "connect",
+  () => {
+
+    console.log(
+      "🟢 Admin conectado"
+    )
+
+  }
+)
+
+// ====================================
 // SOCKET DISCONNECT
-// =========================
-socket.on("disconnect", () => {
-  console.log("🔴 Admin desconectado")
-})
+// ====================================
 
-// =========================
+socket.on(
+  "disconnect",
+  () => {
+
+    console.log(
+      "🔴 Admin desconectado"
+    )
+
+  }
+)
+
+// ====================================
 // INIT
-// =========================
+// ====================================
+
 async function init() {
 
   await checkAdmin()
 
   socket.connect()
 
-  // =========================
-  // RECEBER MENSAGEM
-  // =========================
-  socket.on("novaMensagem", (msg) => {
-
-    console.log("📩 RECEBIDO:", msg)
-
-    // padroniza
-    const mensagem = {
-      from: Number(msg.from || msg.de),
-      to: Number(msg.to || msg.para),
-      text: msg.text || msg.texto
-    }
-
-    // valida
-    if (!mensagem.text) {
-      console.log("❌ Mensagem inválida")
-      return
-    }
-
-    // verifica se pertence ao chat atual
-    if (
-      Number(mensagem.from) !== Number(chatAtual) &&
-      Number(mensagem.to) !== Number(chatAtual)
-    ) {
-      return
-    }
-
-    // salva
-    salvarMensagem(mensagem)
-
-    // renderiza
-    adicionarMensagemNaTela(mensagem)
-  })
 }
 
-// =========================
+// ====================================
 // CHECK ADMIN
-// =========================
+// ====================================
+
 async function checkAdmin() {
 
   try {
 
-    const res = await fetch(
-      "http://localhost:3000/auth/perfil",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+    const res =
+      await fetch(
+        "http://localhost:3000/auth/perfil",
+        {
+
+          headers: {
+
+            Authorization:
+              `Bearer ${token}`
+
+          }
+
         }
-      }
-    )
+      )
 
-    const data = await res.json()
+    const data =
+      await res.json()
 
-    if (!res.ok || !data.user) {
-      window.location.href = "login.html"
+    if (
+      !res.ok ||
+      !data.user
+    ) {
+
+      window.location.href =
+        "login.html"
+
       return
+
     }
 
-    if (data.user.role !== "admin") {
-      window.location.href = "login.html"
+    if (
+      data.user.role !==
+      "admin"
+    ) {
+
+      window.location.href =
+        "login.html"
+
       return
+
     }
 
-    usuario = data.user
+    usuario =
+      data.user
 
-    console.log("👤 ADMIN:", usuario)
-
-    localStorage.setItem(
-      "user",
-      JSON.stringify(usuario)
-    )
+    document.querySelector(
+      ".user"
+    ).innerHTML =
+      `👤 ${usuario.nome}`
 
   } catch (err) {
 
-    console.error("❌ Erro auth:", err)
+    console.error(err)
 
-    window.location.href = "login.html"
   }
+
 }
 
-// =========================
-// PEGAR CHAVE DO CHAT
-// =========================
-function getChatKey(userId) {
+// ====================================
+// NOVA MSG
+// ====================================
 
-  const ids = [
-    Number(usuario.id),
-    Number(userId)
-  ].sort((a, b) => a - b)
+socket.on(
+  "novaMensagem",
+  msg => {
 
-  return `chat_${ids[0]}_${ids[1]}`
+    console.log(
+      "📩 Nova mensagem:",
+      msg
+    )
+
+    const clienteId =
+
+      Number(msg.from) ===
+      Number(usuario.id)
+
+        ? Number(msg.to)
+
+        : Number(msg.from)
+
+    const clienteElemento =
+      criarBotaoCliente(
+        clienteId
+      )
+
+    // =================================
+    // NOVA MENSAGEM
+    // =================================
+
+    if (
+      Number(chatAtual) !==
+      Number(clienteId)
+    ) {
+
+      clienteElemento.classList.add(
+        "nova-msg"
+      )
+
+      let badge =
+        clienteElemento.querySelector(
+          ".badge"
+        )
+
+      if (!badge) {
+
+        badge =
+          document.createElement(
+            "span"
+          )
+
+        badge.classList.add(
+          "badge"
+        )
+
+        badge.innerText = "1"
+
+        clienteElemento.appendChild(
+          badge
+        )
+
+      } else {
+
+        badge.innerText =
+
+          Number(
+            badge.innerText
+          ) + 1
+
+      }
+
+      return
+
+    }
+
+    adicionarMensagemNaTela(
+      msg
+    )
+
+  }
+)
+
+// ====================================
+// HISTÓRICO
+// ====================================
+
+socket.on(
+  "historicoMensagens",
+  mensagens => {
+
+    const box =
+      document.getElementById(
+        "mensagens"
+      )
+
+    if (!box) return
+
+    box.innerHTML = ""
+
+    mensagens.forEach(msg => {
+
+      adicionarMensagemNaTela(
+        msg
+      )
+
+    })
+
+  }
+)
+
+// ====================================
+// CRIAR CLIENTE
+// ====================================
+
+function criarBotaoCliente(
+  clienteId
+) {
+
+  const area =
+    document.getElementById(
+      "listaClientes"
+    )
+
+  if (!area) return
+
+  // remove vazio
+  const vazio =
+    area.querySelector(
+      ".cliente-vazio"
+    )
+
+  if (vazio) {
+
+    vazio.remove()
+
+  }
+
+  // verifica existente
+  let cliente =
+    document.querySelector(
+      `[data-id="${clienteId}"]`
+    )
+
+  if (cliente) {
+
+    return cliente
+
+  }
+
+  cliente =
+    document.createElement(
+      "div"
+    )
+
+  cliente.classList.add(
+    "cliente-item"
+  )
+
+  cliente.dataset.id =
+    clienteId
+
+  cliente.innerHTML = `
+
+    <div class="cliente-avatar">
+      👤
+    </div>
+
+    <div>
+      <strong>
+        Cliente ${clienteId}
+      </strong>
+
+      <p>
+        Online
+      </p>
+    </div>
+
+  `
+
+  cliente.onclick = () => {
+
+    abrirChat(clienteId)
+
+  }
+
+  area.prepend(cliente)
+
+  return cliente
+
 }
 
-// =========================
-// ADICIONAR MENSAGEM NA TELA
-// =========================
-function adicionarMensagemNaTela(msg) {
+// ====================================
+// ABRIR CHAT
+// ====================================
+
+window.abrirChat =
+  function (userId) {
+
+    chatAtual =
+      Number(userId)
+
+    const box =
+      document.getElementById(
+        "mensagens"
+      )
+
+    box.innerHTML = ""
+
+    // remove alerta
+    const clienteElemento =
+      document.querySelector(
+        `[data-id="${userId}"]`
+      )
+
+    if (clienteElemento) {
+
+      clienteElemento.classList.remove(
+        "nova-msg"
+      )
+
+      const badge =
+        clienteElemento.querySelector(
+          ".badge"
+        )
+
+      if (badge) {
+
+        badge.remove()
+
+      }
+
+    }
+
+    socket.emit(
+      "buscarMensagens",
+      chatAtual
+    )
+
+  }
+
+// ====================================
+// ADD MSG
+// ====================================
+
+function adicionarMensagemNaTela(
+  msg
+) {
 
   const box =
-    document.getElementById("mensagens")
+    document.getElementById(
+      "mensagens"
+    )
 
   if (!box) return
 
   const div =
-    document.createElement("div")
+    document.createElement(
+      "div"
+    )
 
-  div.classList.add("message")
+  div.classList.add(
+    "message"
+  )
 
-  // minha mensagem
-  if (
+  const minhaMensagem =
+
     Number(msg.from) ===
     Number(usuario.id)
-  ) {
 
-    div.classList.add("me")
+  if (minhaMensagem) {
+
+    div.classList.add(
+      "mine"
+    )
 
   } else {
 
-    div.classList.add("other")
+    div.classList.add(
+      "other"
+    )
+
   }
 
-  div.innerText = msg.text
+  div.innerText =
+    msg.text
 
   box.appendChild(div)
 
-  box.scrollTop = box.scrollHeight
+  box.scrollTop =
+    box.scrollHeight
+
 }
 
-// =========================
-// ABRIR CHAT
-// =========================
-window.abrirChat = function(userId) {
+// ====================================
+// ENVIAR MSG
+// ====================================
 
-  chatAtual = Number(userId)
-
-  console.log("💬 CHAT:", chatAtual)
-
-  carregarMensagens()
-}
-
-// =========================
-// ENVIAR MENSAGEM
-// =========================
 function enviarMensagem() {
 
   const input =
-    document.getElementById("inputMensagem")
-
-  if (!input) return
-
-  const texto = input.value.trim()
-
-  if (!texto) return
-  if (!usuario?.id) return
-  if (!chatAtual) return
-
-  // cria mensagem
-  const mensagem = {
-    from: Number(usuario.id),
-    to: Number(chatAtual),
-    text: texto
-  }
-
-  console.log("📤 ENVIANDO:", mensagem)
-
-  // envia socket
-  socket.emit("mensagem", mensagem)
-
-  // salva
-  salvarMensagem(mensagem)
-
-  // renderiza instantâneo
-  adicionarMensagemNaTela(mensagem)
-
-  // limpa input
-  input.value = ""
-}
-
-// =========================
-// ENTER PRA ENVIAR
-// =========================
-function ativarEnter() {
-
-  const input =
-    document.getElementById("inputMensagem")
-
-  if (!input) return
-
-  input.addEventListener("keydown", (e) => {
-
-    if (e.key === "Enter") {
-      enviarMensagem()
-    }
-
-  })
-}
-
-// =========================
-// SALVAR MENSAGEM
-// =========================
-function salvarMensagem(msg) {
-
-  const chatKey =
-    getChatKey(
-      msg.from === usuario.id
-        ? msg.to
-        : msg.from
+    document.getElementById(
+      "inputMensagem"
     )
 
-  const mensagens =
-    JSON.parse(
-      localStorage.getItem(chatKey)
-    ) || []
+  if (!input) return
 
-  // evita duplicação
-  const existe = mensagens.find(m =>
+  const texto =
+    input.value.trim()
 
-    Number(m.from) === Number(msg.from) &&
-    Number(m.to) === Number(msg.to) &&
-    m.text === msg.text
+  if (!texto) return
 
-  )
+  if (!chatAtual) {
 
-  if (existe) {
+    alert(
+      "Selecione um cliente"
+    )
+
     return
+
   }
 
-  mensagens.push(msg)
+  socket.emit(
+    "mensagem",
+    {
 
-  localStorage.setItem(
-    chatKey,
-    JSON.stringify(mensagens)
+      to: chatAtual,
+
+      text: texto
+
+    }
   )
 
-  console.log("💾 Mensagem salva")
+  input.value = ""
+
 }
 
-// =========================
-// CARREGAR MENSAGENS
-// =========================
-function carregarMensagens() {
+// ====================================
+// BOTÃO ENVIAR
+// ====================================
 
-  const box =
-    document.getElementById("mensagens")
+document
+  .getElementById(
+    "btnEnviar"
+  )
 
-  if (!box) return
-
-  box.innerHTML = ""
-
-  const chatKey =
-    getChatKey(chatAtual)
-
-  const mensagens =
-    JSON.parse(
-      localStorage.getItem(chatKey)
-    ) || []
-
-  mensagens.forEach(msg => {
-    adicionarMensagemNaTela(msg)
-  })
-
-  console.log("📦 Mensagens carregadas")
-}
-
-// =========================
-// DOM READY
-// =========================
-window.addEventListener("DOMContentLoaded", () => {
-
-  console.log("✅ DOM carregado")
-
-  const btnEnviar =
-    document.getElementById("btnEnviar")
-
-  btnEnviar?.addEventListener(
+  ?.addEventListener(
     "click",
     enviarMensagem
   )
 
-  ativarEnter()
+// ====================================
+// CLIENTES ONLINE
+// ====================================
 
-  init()
-})
+socket.on(
+  "clientesOnline",
+  clientesIds => {
+
+    console.log(
+      "🟢 Online:",
+      clientesIds
+    )
+
+    const area =
+      document.getElementById(
+        "listaClientes"
+      )
+
+    if (!area) return
+
+    // remove vazio
+    const vazio =
+      area.querySelector(
+        ".cliente-vazio"
+      )
+
+    if (vazio) {
+
+      vazio.remove()
+
+    }
+
+    // clientes existentes
+    const existentes =
+      new Set()
+
+    document
+      .querySelectorAll(
+        ".cliente-item"
+      )
+      .forEach(item => {
+
+        existentes.add(
+          Number(
+            item.dataset.id
+          )
+        )
+
+      })
+
+    // adiciona apenas novos
+    clientesIds.forEach(id => {
+
+      if (
+        existentes.has(
+          Number(id)
+        )
+      ) {
+
+        return
+
+      }
+
+      criarBotaoCliente(id)
+
+    })
+
+  }
+)
+
+// ====================================
+// ENTER
+// ====================================
+
+document
+  .getElementById(
+    "inputMensagem"
+  )
+
+  ?.addEventListener(
+    "keydown",
+    e => {
+
+      if (e.key === "Enter") {
+
+        enviarMensagem()
+
+      }
+
+    }
+  )
+
+// ====================================
+// INIT
+// ====================================
+
+window.addEventListener(
+  "DOMContentLoaded",
+  init
+)

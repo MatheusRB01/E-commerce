@@ -1,158 +1,479 @@
 function checkAuth() {
-  const token = localStorage.getItem("token")
+
+  const token =
+    localStorage.getItem("token")
 
   if (!token) {
-    window.location.replace("login.html")
+
+    window.location.replace(
+      "login.html"
+    )
+
     return null
+
   }
 
   return token
+
 }
 
-const token = checkAuth()
+const token =
+  checkAuth()
 
-let usuarioLogado = JSON.parse(localStorage.getItem("user"))
-
-// =========================
+// ====================================
 // SOCKET
-// =========================
-const socket = io("http://localhost:3000", {
-  transports: ["websocket"]
-})
+// ====================================
 
-socket.on("connect", () => {
-  console.log("Socket conectado ✅")
-})
+const socket = io(
+  "http://localhost:3000",
+  {
 
-// =========================
-// USUÁRIO
-// =========================
+    auth: {
+      token
+    },
+
+    transports: ["websocket"],
+
+    reconnection: true,
+
+    reconnectionAttempts: Infinity,
+
+    reconnectionDelay: 1000
+
+  }
+)
+
+// ====================================
+// VARIÁVEIS
+// ====================================
+
+let usuarioLogado =
+  null
+
+const ADMIN_ID = 1
+
+// ====================================
+// SOCKET CONNECT
+// ====================================
+
+socket.on(
+  "connect",
+  () => {
+
+    console.log(
+      "🟢 Cliente conectado"
+    )
+
+  }
+)
+
+// ====================================
+// SOCKET DISCONNECT
+// ====================================
+
+socket.on(
+  "disconnect",
+  () => {
+
+    console.log(
+      "🔴 Cliente desconectado"
+    )
+
+  }
+)
+
+// ====================================
+// CARREGAR USUÁRIO
+// ====================================
+
 async function carregarUsuario() {
+
   try {
-    const res = await fetch("http://localhost:3000/auth/perfil", {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+
+    const res =
+      await fetch(
+        "http://localhost:3000/auth/perfil",
+        {
+
+          headers: {
+
+            Authorization:
+              `Bearer ${token}`
+
+          }
+
+        }
+      )
 
     if (!res.ok) {
-      localStorage.clear()
-      window.location.replace("login.html")
+
+      console.log(
+        "Erro ao validar usuário"
+      )
+
       return
+
     }
 
-    const data = await res.json()
+    const data =
+      await res.json()
 
-    usuarioLogado = data.user
+    usuarioLogado =
+      data.user
 
-    localStorage.setItem("user", JSON.stringify(usuarioLogado))
+    localStorage.setItem(
+      "user",
+      JSON.stringify(
+        usuarioLogado
+      )
+    )
 
-    atualizarNome(usuarioLogado)
+    atualizarNome(
+      usuarioLogado
+    )
+
+    // ====================================
+    // HISTÓRICO
+    // ====================================
+
+    socket.emit(
+      "buscarMensagens",
+      ADMIN_ID
+    )
 
   } catch (err) {
-    console.error("Erro ao carregar usuário:", err)
+
+    console.error(err)
+
   }
+
 }
+
+// ====================================
+// ATUALIZA NOME
+// ====================================
 
 function atualizarNome(user) {
-  const userName = document.getElementById("userName")
+
+  const userName =
+    document.getElementById(
+      "userName"
+    )
 
   if (userName) {
-    userName.innerHTML = `👤 ${user.nome}`
+
+    userName.innerHTML =
+      `👤 ${user.nome}`
+
   }
+
 }
 
-// =========================
+// ====================================
+// PRODUTOS
+// ====================================
+
+async function carregarProdutos() {
+
+  try {
+
+    const res =
+      await fetch(
+        "http://localhost:3000/produtos"
+      )
+
+    const produtos =
+      await res.json()
+
+    const lista =
+      document.getElementById(
+        "lista"
+      )
+
+    if (!lista) return
+
+    lista.innerHTML = ""
+
+    produtos.forEach(p => {
+
+      lista.innerHTML += `
+
+        <div class="produto">
+
+          <img
+            src="http://localhost:3000/uploads/${p.imagem}"
+            alt="${p.nome}"
+          >
+
+          <h3>
+            ${p.nome}
+          </h3>
+
+          <p class="preco">
+            R$ ${p.preco}
+          </p>
+
+          <p class="descricao">
+            ${p.descricao || ""}
+          </p>
+
+        </div>
+
+      `
+
+    })
+
+  } catch (err) {
+
+    console.error(
+      "Erro produtos:",
+      err
+    )
+
+  }
+
+}
+
+// ====================================
 // LOGOUT
-// =========================
-const logoutBtn = document.querySelector(".logout")
+// ====================================
+
+const logoutBtn =
+  document.querySelector(
+    ".logout"
+  )
 
 if (logoutBtn) {
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault()
 
-    localStorage.clear()
-    window.location.replace("login.html")
-  })
+  logoutBtn.addEventListener(
+    "click",
+    e => {
+
+      e.preventDefault()
+
+      localStorage.clear()
+
+      window.location.replace(
+        "login.html"
+      )
+
+    }
+  )
+
 }
 
-// =========================
-// BLOQUEAR VOLTAR
-// =========================
-window.history.pushState(null, null, window.location.href)
+// ====================================
+// CHAT ABRIR/FECHAR
+// ====================================
 
-window.onpopstate = () => {
-  window.history.go(1)
+const abrirChat =
+  document.getElementById(
+    "abrirChat"
+  )
+
+const fecharChat =
+  document.getElementById(
+    "fecharChat"
+  )
+
+const chatBox =
+  document.getElementById(
+    "chatBox"
+  )
+
+if (
+  abrirChat &&
+  fecharChat &&
+  chatBox
+) {
+
+  abrirChat.addEventListener(
+    "click",
+    () => {
+
+      chatBox.classList.add(
+        "active"
+      )
+
+    }
+  )
+
+  fecharChat.addEventListener(
+    "click",
+    () => {
+
+      chatBox.classList.remove(
+        "active"
+      )
+
+    }
+  )
+
 }
 
-// =========================
-// CHAT - ABRIR/FECHAR
-// =========================
-const abrirChat = document.getElementById("abrirChat")
-const fecharChat = document.getElementById("fecharChat")
-const chatBox = document.getElementById("chatBox")
+// ====================================
+// RENDER MSG
+// ====================================
 
-if (abrirChat && fecharChat && chatBox) {
-
-  abrirChat.addEventListener("click", () => {
-    chatBox.classList.add("active")
-  })
-
-  fecharChat.addEventListener("click", () => {
-    chatBox.classList.remove("active")
-  })
-}
-
-// =========================
-// ENVIAR MENSAGEM
-// =========================
-function enviarMensagem() {
-  const input = document.getElementById("inputMensagem")
-
-  const texto = input.value.trim()
-  if (!texto || !usuarioLogado) return
-
-  socket.emit("mensagem", {
-    from: usuarioLogado.id,
-    to: 1,
-    text: texto
-  })
-
-  input.value = ""
-}
-
-document.getElementById("btnEnviar")?.addEventListener("click", enviarMensagem)
-
-// =========================
-// RECEBER MENSAGEM
-// =========================
-socket.on("novaMensagem", (msg) => {
-  mostrarMensagem(msg)
-})
-
-// =========================
-// RENDER MENSAGEM (CORRETO)
-// =========================
 function mostrarMensagem(msg) {
 
-  const box = document.getElementById("mensagens")
+  const box =
+    document.getElementById(
+      "mensagens"
+    )
+
   if (!box) return
 
-  const div = document.createElement("div")
+  const div =
+    document.createElement(
+      "div"
+    )
 
-  const meuId = usuarioLogado?.id
-  const isMine = msg.from === meuId
+  const minhaMensagem =
 
-  div.classList.add("message", isMine ? "mine" : "other")
+    Number(msg.from) ===
+    Number(usuarioLogado.id)
 
-  div.innerText = msg.text ?? ""
+  div.classList.add(
+    "message"
+  )
+
+  if (minhaMensagem) {
+
+    div.classList.add(
+      "mine"
+    )
+
+  } else {
+
+    div.classList.add(
+      "other"
+    )
+
+  }
+
+  div.innerText =
+    msg.text
 
   box.appendChild(div)
 
-  box.scrollTop = box.scrollHeight
+  box.scrollTop =
+    box.scrollHeight
+
 }
 
-// =========================
+// ====================================
+// NOVA MSG
+// ====================================
+
+socket.on(
+  "novaMensagem",
+  msg => {
+
+    mostrarMensagem(msg)
+
+  }
+)
+
+// ====================================
+// HISTÓRICO
+// ====================================
+
+socket.on(
+  "historicoMensagens",
+  mensagens => {
+
+    const box =
+      document.getElementById(
+        "mensagens"
+      )
+
+    if (!box) return
+
+    box.innerHTML = ""
+
+    mensagens.forEach(msg => {
+
+      mostrarMensagem(msg)
+
+    })
+
+  }
+)
+
+// ====================================
+// ENVIAR MSG
+// ====================================
+
+function enviarMensagem() {
+
+  const input =
+    document.getElementById(
+      "inputMensagem"
+    )
+
+  if (!input) return
+
+  const texto =
+    input.value.trim()
+
+  if (!texto) return
+
+  socket.emit(
+    "mensagem",
+    {
+
+      to: ADMIN_ID,
+
+      text: texto
+
+    }
+  )
+
+  input.value = ""
+
+}
+
+// ====================================
+// BOTÃO ENVIAR
+// ====================================
+
+document
+  .getElementById(
+    "btnEnviar"
+  )
+
+  ?.addEventListener(
+    "click",
+    enviarMensagem
+  )
+
+// ====================================
+// ENTER
+// ====================================
+
+document
+  .getElementById(
+    "inputMensagem"
+  )
+
+  ?.addEventListener(
+    "keydown",
+    e => {
+
+      if (e.key === "Enter") {
+
+        enviarMensagem()
+
+      }
+
+    }
+  )
+
+// ====================================
 // INIT
-// =========================
+// ====================================
+
 carregarUsuario()
+
+carregarProdutos()

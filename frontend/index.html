@@ -2,96 +2,298 @@
 <html lang="pt-BR">
 
 <head>
+
   <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="css/adimin.css">
-  <title>Admin - Produtos</title>
+
+  <title>
+    Admin - Produtos
+  </title>
+
 </head>
 
 <body>
 
-  <!-- CHAT FLUTUANTE -->
+  <!-- =====================================
+  CHAT
+  ====================================== -->
+
   <div id="chatBox" class="chat-box">
 
+    <!-- HEADER -->
     <div class="chat-header">
-      <h3>💬 Atendimento</h3>
-      <button id="fecharChat">✖</button>
+
+      <div class="chat-info">
+
+        <div class="chat-avatar">
+          💬
+        </div>
+
+        <div class="chat-textos">
+
+          <h3 id="chatTitulo">
+            Atendimento
+          </h3>
+
+          <span id="chatStatus">
+            🟢 Online
+          </span>
+
+          <small id="statusDigitando">
+          </small>
+
+        </div>
+
+      </div>
+
+      <button id="fecharChat">
+        ✖
+      </button>
+
     </div>
 
-    <div id="mensagens" class="chat-messages">
-      <div class="message other">Olá 👋</div>
-    </div>
+    <!-- BODY -->
+    <div class="chat-body">
 
-    <div class="chat-input-area">
-      <input type="text" id="inputMensagem" placeholder="Digite uma mensagem...">
-      <button id="btnEnviar">Enviar</button>
+      <!-- CLIENTES -->
+      <div id="clientesOnline" class="clientes-online">
+
+        <div class="clientes-header">
+          👥 Conversas
+        </div>
+
+        <!-- CLIENTES VIA JS -->
+        <div id="listaClientes">
+
+          <div class="cliente-vazio">
+            Nenhum cliente online
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- CHAT CONTENT -->
+      <div class="chat-content">
+
+        <!-- MENSAGENS -->
+        <div id="mensagens" class="chat-messages">
+
+          <div class="chat-empty">
+            Selecione uma conversa
+          </div>
+
+        </div>
+
+        <!-- INPUT -->
+        <div class="chat-input-area">
+
+          <input type="text" id="inputMensagem" placeholder="Digite uma mensagem..." autocomplete="off">
+
+          <button id="btnEnviar">
+            Enviar
+          </button>
+
+        </div>
+
+      </div>
+
     </div>
 
   </div>
 
-  <!-- NAVBAR -->
+  <!-- =====================================
+  NAVBAR
+  ====================================== -->
+
   <header class="navbar">
-    <div class="logo">🛒 AdminPanel</div>
+
+    <div class="logo">
+      🛒 AdminPanel
+    </div>
 
     <nav class="nav-links">
-      <a href="#">Dashboard</a>
-      <a href="#">Produtos</a>
-      <a href="#">Pedidos</a>
-      <a href="usuarios.html">Usuários</a>
+
+      <a href="#">
+        Dashboard
+      </a>
+
+      <a href="#">
+        Produtos
+      </a>
+
+      <a href="#">
+        Pedidos
+      </a>
+
+      <a href="usuarios.html">
+        Usuários
+      </a>
+
     </nav>
 
     <div class="top-actions">
-      <button id="abrirChat" class="chat-button">💬 Suporte</button>
-      <div class="user">👤 Admin</div>
+
+      <button id="abrirChat" class="chat-button">
+        💬 Suporte
+      </button>
+
+      <div class="user">
+        👤 Admin
+      </div>
+
     </div>
+
   </header>
 
-  <!-- CONTAINER -->
+  <!-- =====================================
+  CONTAINER
+  ====================================== -->
+
   <div class="container">
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
-      <h3>Menu</h3>
-      <a href="#">➕ Cadastrar Produto</a>
-      <a href="#">📦 Listar Produtos</a>
-      <a href="#">📊 Relatórios</a>
-      <a href="#">⚙️ Configurações</a>
-      <a href="#" class="logout">Sair</a>
+
+      <h3>
+        Menu
+      </h3>
+
+      <a href="#">
+        ➕ Cadastrar Produto
+      </a>
+
+      <a href="#">
+        📦 Listar Produtos
+      </a>
+
+      <a href="#">
+        📊 Relatórios
+      </a>
+
+      <a href="#">
+        ⚙️ Configurações
+      </a>
+
+      <a href="#" class="logout">
+        🚪 Sair
+      </a>
+
     </aside>
 
-    <!-- APP -->
+    <!-- MAIN -->
     <main id="app">
 
       <div class="page">
 
-        <h2>Cadastrar Produto</h2>
+        <h2>
+          Cadastrar Produto
+        </h2>
 
+        <!-- FORM -->
         <form id="form">
+
           <input id="nome" placeholder="Nome" required>
+
           <input id="valor" type="number" placeholder="Valor" required>
+
           <input id="descri" placeholder="Descrição">
 
+          <!-- UPLOAD -->
           <label for="imagem" class="file-upload">
+
             📷 Clique para enviar imagem
+
             <input type="file" id="imagem">
+
           </label>
 
+          <!-- PREVIEW -->
           <div id="preview-container">
+
             <img id="preview-img" alt="Preview">
+
           </div>
 
-          <button type="submit">Cadastrar</button>
+          <button type="submit">
+            Cadastrar
+          </button>
+
         </form>
 
-        <section id="lista"></section>
+        <!-- LISTA PRODUTOS -->
+        <section id="lista">
+        </section>
 
       </div>
 
     </main>
+
   </div>
 
-  <!-- SOCKET -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script type="module" src="script.js"></script>
+  <!-- =====================================
+  SOCKET.IO
+  ====================================== -->
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js">
+  </script>
+
+  <!-- =====================================
+  CHAT OPEN/CLOSE
+  ====================================== -->
+
+  <script>
+
+    const chatBox =
+      document.getElementById(
+        "chatBox"
+      )
+
+    const abrirChat =
+      document.getElementById(
+        "abrirChat"
+      )
+
+    const fecharChat =
+      document.getElementById(
+        "fecharChat"
+      )
+
+    abrirChat.addEventListener(
+      "click",
+      () => {
+
+        chatBox.classList.add(
+          "active"
+        )
+
+      }
+    )
+
+    fecharChat.addEventListener(
+      "click",
+      () => {
+
+        chatBox.classList.remove(
+          "active"
+        )
+
+      }
+    )
+
+  </script>
+
+  <!-- =====================================
+  SCRIPT PRINCIPAL
+  ====================================== -->
+
+  <script type="module" src="script.js">
+  </script>
 
 </body>
+
 </html>
