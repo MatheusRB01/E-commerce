@@ -2,7 +2,7 @@ import sequelize from "../config/database.js"
 import { DataTypes } from "sequelize"
 
 import UserModel from "./User.js"
-import MessageModel from "./Message.js"
+import MessageModel from "./message.js"
 
 const db = {
   sequelize,
