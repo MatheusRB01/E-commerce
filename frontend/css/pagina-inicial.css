@@ -167,3 +167,89 @@ header {
 .btn:hover {
   background: #8c6d45;
 }
+
+/* FOOTER */
+.footer {
+
+  margin-top: 40px;
+
+  width: 100%;
+
+  background: transparent;
+
+  text-align: center;
+
+}
+
+/* CONTEÚDO */
+.footer-content h3 {
+
+  color: #b08b57;
+
+  font-size: 1.3rem;
+
+  margin-bottom: 8px;
+
+}
+
+.footer-content p {
+
+  color: #555;
+
+  font-size: 14px;
+
+  margin: 6px 0;
+
+}
+
+/* BOTÕES */
+.footer-contatos {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin-top: 15px;
+
+}
+
+.footer-contatos a {
+
+  text-decoration: none;
+
+  background: #b08b57;
+
+  color: white;
+
+  padding: 10px 18px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  font-weight: bold;
+
+  transition: 0.3s ease;
+
+}
+
+.footer-contatos a:hover {
+
+  background: #8c6d45;
+
+  transform: translateY(-2px);
+
+}
+
+/* COPYRIGHT */
+.copyright {
+
+  margin-top: 15px;
+
+  font-size: 12px;
+
+  color: #777;
+
+}

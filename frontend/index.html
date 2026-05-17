@@ -5,14 +5,20 @@
 
   <meta charset="UTF-8">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/adimin.css">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>
     Admin - Produtos
   </title>
+
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="css/adimin.css"
+  >
 
 </head>
 
@@ -22,7 +28,10 @@
   CHAT
   ====================================== -->
 
-  <div id="chatBox" class="chat-box">
+  <div
+    id="chatBox"
+    class="chat-box"
+  >
 
     <!-- HEADER -->
     <div class="chat-header">
@@ -60,7 +69,10 @@
     <div class="chat-body">
 
       <!-- CLIENTES -->
-      <div id="clientesOnline" class="clientes-online">
+      <div
+        id="clientesOnline"
+        class="clientes-online"
+      >
 
         <div class="clientes-header">
           👥 Conversas
@@ -81,7 +93,10 @@
       <div class="chat-content">
 
         <!-- MENSAGENS -->
-        <div id="mensagens" class="chat-messages">
+        <div
+          id="mensagens"
+          class="chat-messages"
+        >
 
           <div class="chat-empty">
             Selecione uma conversa
@@ -92,7 +107,12 @@
         <!-- INPUT -->
         <div class="chat-input-area">
 
-          <input type="text" id="inputMensagem" placeholder="Digite uma mensagem..." autocomplete="off">
+          <input
+            type="text"
+            id="inputMensagem"
+            placeholder="Digite uma mensagem..."
+            autocomplete="off"
+          >
 
           <button id="btnEnviar">
             Enviar
@@ -138,13 +158,23 @@
 
     <div class="top-actions">
 
-      <button id="abrirChat" class="chat-button">
+      <button
+        id="abrirChat"
+        class="chat-button"
+      >
         💬 Suporte
       </button>
 
       <div class="user">
         👤 Admin
       </div>
+
+      <a
+        href="#"
+        class="logout"
+      >
+        🚪 Sair
+      </a>
 
     </div>
 
@@ -154,36 +184,7 @@
   CONTAINER
   ====================================== -->
 
-  <div class="container">
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-
-      <h3>
-        Menu
-      </h3>
-
-      <a href="#">
-        ➕ Cadastrar Produto
-      </a>
-
-      <a href="#">
-        📦 Listar Produtos
-      </a>
-
-      <a href="#">
-        📊 Relatórios
-      </a>
-
-      <a href="#">
-        ⚙️ Configurações
-      </a>
-
-      <a href="#" class="logout">
-        🚪 Sair
-      </a>
-
-    </aside>
+  <div class="container full">
 
     <!-- MAIN -->
     <main id="app">
@@ -197,25 +198,46 @@
         <!-- FORM -->
         <form id="form">
 
-          <input id="nome" placeholder="Nome" required>
+          <input
+            id="nome"
+            placeholder="Nome"
+            required
+          >
 
-          <input id="valor" type="number" placeholder="Valor" required>
+          <input
+            id="valor"
+            type="number"
+            placeholder="Valor"
+            required
+          >
 
-          <input id="descri" placeholder="Descrição">
+          <input
+            id="descri"
+            placeholder="Descrição"
+          >
 
           <!-- UPLOAD -->
-          <label for="imagem" class="file-upload">
+          <label
+            for="imagem"
+            class="file-upload"
+          >
 
             📷 Clique para enviar imagem
 
-            <input type="file" id="imagem">
+            <input
+              type="file"
+              id="imagem"
+            >
 
           </label>
 
           <!-- PREVIEW -->
           <div id="preview-container">
 
-            <img id="preview-img" alt="Preview">
+            <img
+              id="preview-img"
+              alt="Preview"
+            >
 
           </div>
 
@@ -291,7 +313,10 @@
   SCRIPT PRINCIPAL
   ====================================== -->
 
-  <script type="module" src="script.js">
+  <script
+    type="module"
+    src="script.js"
+  >
   </script>
 
 </body>

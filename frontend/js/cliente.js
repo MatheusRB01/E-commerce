@@ -1,3 +1,7 @@
+// ====================================
+// AUTH
+// ====================================
+
 function checkAuth() {
 
   const token =
@@ -51,6 +55,14 @@ let usuarioLogado =
   null
 
 const ADMIN_ID = 1
+
+// ====================================
+// CARRINHO
+// ====================================
+
+let carrinho = JSON.parse(
+  localStorage.getItem("carrinho")
+) || []
 
 // ====================================
 // SOCKET CONNECT
@@ -132,10 +144,6 @@ async function carregarUsuario() {
       usuarioLogado
     )
 
-    // ====================================
-    // HISTÓRICO
-    // ====================================
-
     socket.emit(
       "buscarMensagens",
       ADMIN_ID
@@ -205,17 +213,30 @@ async function carregarProdutos() {
             alt="${p.nome}"
           >
 
-          <h3>
-            ${p.nome}
-          </h3>
+          <div class="produto-content">
 
-          <p class="preco">
-            R$ ${p.preco}
-          </p>
+            <h3>
+              ${p.nome}
+            </h3>
 
-          <p class="descricao">
-            ${p.descricao || ""}
-          </p>
+            <p class="preco">
+              R$ ${Number(p.preco).toFixed(2)}
+            </p>
+
+            <p class="descricao">
+              ${p.descricao || ""}
+            </p>
+
+            <button
+              class="add-cart"
+              onclick='adicionarCarrinho(
+                ${JSON.stringify(p)}
+              )'
+            >
+              Adicionar ao Carrinho
+            </button>
+
+          </div>
 
         </div>
 
@@ -232,6 +253,193 @@ async function carregarProdutos() {
 
   }
 
+}
+
+// ====================================
+// CARRINHO
+// ====================================
+
+function toggleCarrinho() {
+
+  const carrinhoBox =
+    document.getElementById(
+      "carrinho"
+    )
+
+  carrinhoBox.classList.toggle(
+    "active"
+  )
+
+}
+
+// ====================================
+// ADICIONAR
+// ====================================
+
+function adicionarCarrinho(produto) {
+
+  carrinho.push(produto)
+
+  salvarCarrinho()
+
+  atualizarCarrinho()
+
+}
+
+// ====================================
+// REMOVER
+// ====================================
+
+function removerCarrinho(index) {
+
+  carrinho.splice(index, 1)
+
+  salvarCarrinho()
+
+  atualizarCarrinho()
+
+}
+
+// ====================================
+// SALVAR
+// ====================================
+
+function salvarCarrinho() {
+
+  localStorage.setItem(
+    "carrinho",
+    JSON.stringify(carrinho)
+  )
+
+}
+
+// ====================================
+// ATUALIZAR CARRINHO
+// ====================================
+
+function atualizarCarrinho() {
+
+  const cartItems =
+    document.getElementById(
+      "cart-items"
+    )
+
+  const cartCount =
+    document.getElementById(
+      "cart-count"
+    )
+
+  const cartTotal =
+    document.getElementById(
+      "cart-total"
+    )
+
+  if (!cartItems) return
+
+  cartItems.innerHTML = ""
+
+  let total = 0
+
+  carrinho.forEach(
+    (produto, index) => {
+
+      total += Number(
+        produto.preco
+      )
+
+      cartItems.innerHTML += `
+
+        <div class="cart-item">
+
+          <img
+            src="http://localhost:3000/uploads/${produto.imagem}"
+            alt="${produto.nome}"
+          >
+
+          <div class="cart-info">
+
+            <h4>
+              ${produto.nome}
+            </h4>
+
+            <p>
+              R$ ${Number(produto.preco).toFixed(2)}
+            </p>
+
+            <button
+              class="remove-btn"
+              onclick="removerCarrinho(${index})"
+            >
+              Remover
+            </button>
+
+          </div>
+
+        </div>
+
+      `
+
+    }
+  )
+
+  cartCount.innerText =
+    carrinho.length
+
+  cartTotal.innerText =
+    total.toFixed(2)
+
+}
+
+// ====================================
+// FINALIZAR COMPRA
+// ====================================
+
+function finalizarCompra() {
+
+  if (carrinho.length === 0) {
+
+    alert(
+      "Seu carrinho está vazio"
+    )
+
+    return
+
+  }
+
+  let mensagem =
+    "🛒 *Novo Pedido*%0A%0A"
+
+  carrinho.forEach(produto => {
+
+    mensagem +=
+      `• ${produto.nome} - R$ ${Number(produto.preco).toFixed(2)}%0A`
+
+  })
+
+  const total =
+    carrinho.reduce(
+      (acc, item) => {
+
+        return acc + Number(item.preco)
+
+      },
+      0
+    )
+
+  mensagem +=
+    `%0A💰 Total: R$ ${total.toFixed(2)}`
+
+  window.open(
+    `https://wa.me/5511966733218?text=${mensagem}`,
+    "_blank"
+  )
+
+  // LIMPA O CARRINHO
+  carrinho = []
+
+  salvarCarrinho()
+
+  atualizarCarrinho()
 }
 
 // ====================================
@@ -263,7 +471,7 @@ if (logoutBtn) {
 }
 
 // ====================================
-// CHAT ABRIR/FECHAR
+// CHAT
 // ====================================
 
 const abrirChat =
@@ -312,7 +520,7 @@ if (
 }
 
 // ====================================
-// RENDER MSG
+// MSG
 // ====================================
 
 function mostrarMensagem(msg) {
@@ -362,10 +570,6 @@ function mostrarMensagem(msg) {
 
 }
 
-// ====================================
-// NOVA MSG
-// ====================================
-
 socket.on(
   "novaMensagem",
   msg => {
@@ -374,10 +578,6 @@ socket.on(
 
   }
 )
-
-// ====================================
-// HISTÓRICO
-// ====================================
 
 socket.on(
   "historicoMensagens",
@@ -434,10 +634,6 @@ function enviarMensagem() {
 
 }
 
-// ====================================
-// BOTÃO ENVIAR
-// ====================================
-
 document
   .getElementById(
     "btnEnviar"
@@ -447,10 +643,6 @@ document
     "click",
     enviarMensagem
   )
-
-// ====================================
-// ENTER
-// ====================================
 
 document
   .getElementById(
@@ -477,3 +669,21 @@ document
 carregarUsuario()
 
 carregarProdutos()
+
+atualizarCarrinho()
+
+// ====================================
+// FUNÇÕES GLOBAIS
+// ====================================
+
+window.adicionarCarrinho =
+  adicionarCarrinho
+
+window.removerCarrinho =
+  removerCarrinho
+
+window.toggleCarrinho =
+  toggleCarrinho
+
+window.finalizarCompra =
+  finalizarCompra

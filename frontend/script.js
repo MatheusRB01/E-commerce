@@ -477,7 +477,7 @@ if (logoutBtn) {
       localStorage.clear()
 
       window.location.replace(
-        "pagina inicial.html"
+        "login.html"
       )
 
     }

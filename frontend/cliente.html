@@ -63,6 +63,73 @@
   </section>
 
   <!-- =====================================
+  CARRINHO
+  ====================================== -->
+
+  <aside
+    id="carrinho"
+    class="carrinho"
+  >
+
+    <!-- HEADER -->
+    <div class="carrinho-header">
+
+      <h2>
+        Seu Carrinho
+      </h2>
+
+      <button onclick="toggleCarrinho()">
+        ✕
+      </button>
+
+    </div>
+
+    <!-- ITENS -->
+    <div id="cart-items">
+    </div>
+
+    <!-- FOOTER -->
+    <div class="carrinho-footer">
+
+      <h3>
+
+        Total:
+        R$
+
+        <span id="cart-total">
+          0.00
+        </span>
+
+      </h3>
+
+      <button
+        class="finalizar-btn"
+        onclick="finalizarCompra()"
+      >
+        Finalizar Compra
+      </button>
+
+    </div>
+
+  </aside>
+
+  <!-- =====================================
+  BOTÃO CARRINHO
+  ====================================== -->
+  <button
+    class="cart-button"
+    onclick="toggleCarrinho()"
+  >
+
+    🛒
+
+    <span id="cart-count">
+      0
+    </span>
+
+  </button>
+
+  <!-- =====================================
   BOTÃO CHAT
   ====================================== -->
   <button
@@ -99,7 +166,6 @@
             🟢 Online
           </span>
 
-          <!-- digitando -->
           <small id="statusDigitando">
           </small>
 
@@ -121,17 +187,6 @@
       id="clientesOnline"
       class="clientes-online"
     >
-
-      <!-- EXEMPLOS -->
-
-      <!--
-
-      <button onclick="abrirConversa(2)">
-        Cliente 2
-      </button>
-
-      -->
-
     </div>
 
     <!-- =====================================
@@ -142,7 +197,6 @@
       id="mensagens"
       class="chat-messages"
     >
-
     </div>
 
     <!-- =====================================

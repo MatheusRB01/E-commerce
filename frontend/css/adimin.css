@@ -130,7 +130,7 @@ SIDEBAR
 }
 
 .logout{
-  color:#ef4444 !important;
+  color:#f7f7f7 !important;
 }
 
 /* =========================================
@@ -932,5 +932,73 @@ NOTIFICAÇÃO NOVA MENSAGEM
     transform: scale(1);
     opacity: 1;
   }
+
+}
+
+/* =========================
+CONTAINER FULL
+========================= */
+
+.container.full {
+
+  display: block;
+
+  width: 100%;
+
+}
+
+/* =========================
+MAIN
+========================= */
+
+#app {
+
+  width: 100%;
+
+  padding: 30px;
+
+}
+
+/* =========================
+TOP ACTIONS
+========================= */
+
+.top-actions {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+}
+
+/* =========================
+LOGOUT
+========================= */
+
+.logout {
+
+  text-decoration: none;
+
+  background: #ef4444;
+
+  color: rgb(8, 6, 6);
+
+  padding: 10px 16px;
+
+  border-radius: 10px;
+
+  font-weight: bold;
+
+  transition: 0.3s;
+
+}
+
+.logout:hover {
+
+  background: #dc2626;
+
+  transform: translateY(-2px);
 
 }

@@ -234,22 +234,6 @@ export function setupSocket(io) {
             payload
           )
 
-          // ====================================
-          // ADMINS
-          // ====================================
-
-          if (
-            role !== "admin"
-          ) {
-
-            io.to("admin")
-              .emit(
-                "novaMensagem",
-                payload
-              )
-
-          }
-
         } catch (error) {
 
           console.error(error)
